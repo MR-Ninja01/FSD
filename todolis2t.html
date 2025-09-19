@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        .parent
+        {
+            height: auto;
+            width: 400px;
+            border: 2px solid black;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: khaki;
+        }
+
+        input
+        {
+            height: 22px;
+        }
+        button{
+            height: 25px;
+            width: 60px;
+            border-radius: 5px;
+            background-color: lightblue;
+        }
+        #todo-list {
+            list-style: none;
+            padding: 0;
+        }
+        #todo-list li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .tick-btn {
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .delete-btn {
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        span.done {
+            text-decoration: line-through;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+    <div class="parent">
+    <h2>Todo List</h2>
+    <input type="text" id="todo-input" placeholder="Add a new task" onkeydown="if(event.key==='Enter') addTodo()">
+    <button onclick="addTodo()">Add</button>
+    <ol id="todo-list" type="a"></ol>
+    </div>
+
+    <script>
+        function addTodo() {
+            const input = document.getElementById('todo-input');
+            const value = input.value.trim();
+            if (value === "") return;
+            const list = document.getElementById('todo-list');
+            // Check for duplicates (case-insensitive)
+            for (let item of list.children) {
+                if (item.firstChild.textContent.toLowerCase() === value.toLowerCase()) {
+                    alert("Task is already added");
+                    input.value = "";
+                    return;
+                }
+            }
+            const li = document.createElement('li');
+            const span = document.createElement('span');
+            span.textContent = value;
+            li.appendChild(span);
+
+            // Add tick button
+            const tickBtn = document.createElement('button');
+            tickBtn.textContent = "✅";
+            tickBtn.className = "tick-btn";
+            tickBtn.onclick = function() {
+                span.classList.toggle('done');
+            };
+            li.appendChild(tickBtn);
+
+            // Add delete button
+            const delBtn = document.createElement('button');
+            delBtn.textContent = "❌";
+            delBtn.className = "delete-btn";
+            delBtn.onclick = function() {
+                li.remove();
+            };
+            li.appendChild(delBtn);
+
+            list.appendChild(li);
+            input.value = "";
+        }
+    </script>
+</body>
+</html>
