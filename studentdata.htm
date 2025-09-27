@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Portal</title>
+  <style>
+    /* Background with animated gradient */
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2, #ff758c, #ff7eb3);
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Main container */
+    .parent {
+      width: 550px;
+      padding: 30px;
+      border-radius: 20px;
+      background: #ffffff;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    /* Input fields */
+    .inp,
+    select {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 12px;
+      border: 2px solid #ddd;
+      outline: none;
+      font-size: 16px;
+      background: #f9f9f9;
+      color: #222;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    .inp:focus {
+      border-color: #667eea;
+      background: #fff;
+      box-shadow: 0 0 8px rgba(102, 126, 234, 0.5);
+    }
+
+    ::placeholder {
+      color: #666;
+    }
+
+    /* Buttons */
+    button,
+    input[type="button"] {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      border-radius: 12px;
+      padding: 10px 16px;
+      margin: 10px 6px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      color: #fff;
+    }
+
+    button:hover,
+    input[type="button"]:hover {
+      transform: translateY(-3px) scale(1.05);
+      background: linear-gradient(135deg, #5a67d8, #6b46c1);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Table styling */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    th,
+    td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+      color: #333;
+      font-weight: 500;
+    }
+
+    th {
+      background: #667eea;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    tr:hover td {
+      background: #f3f3f3;
+    }
+
+    /* Result box */
+    #result {
+      margin-top: 22px;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 14px;
+      border-radius: 12px;
+      background: #f1f5f9;
+      border: 2px solid #ddd;
+      color: #333;
+    }
+
+    /* Topper colors */
+    .gold {
+      color: gold;
+      font-weight: bold;
+    }
+
+    .silver {
+      color: silver;
+      font-weight: bold;
+    }
+
+    .bronze {
+      color: #cd7f32;
+      font-weight: bold;
+    }
+
+    /* Delete button inside table */
+    td button {
+      background: #ff6b6b;
+      color: white;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    td button:hover {
+      background: #e84141;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="parent">
+    <h2>🎓 STUDENT PORTAL</h2>
+
+    <input type="text" id="name" placeholder="Enter student name.." class="inp">
+    <input type="number" id="marks" placeholder="Enter marks.." class="inp">
+    <select id="branch" class="inp">
+      <option value="select">--select--</option>
+      <option value="CSE">CSE</option>
+      <option value="DS">DS</option>
+      <option value="AIML">AIML</option>
+    </select>
+
+    <br>
+    <input type="button" value="➕ ADD Student" id="addbt">
+
+    <div>
+      <button type="button" id="filterbt">🔍 Filter (<40 Marks)</button>
+      <button type="button" id="avgbt">📊 Average Marks</button>
+      <button type="button" id="topperbt">🏆 Top 3 Students</button>
+    </div>
+
+    <table id="datatable">
+      <tr>
+        <th>Name</th>
+        <th>Marks</th>
+        <th>Branch</th>
+        <th>Action</th>
+      </tr>
+    </table>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const s_name = document.getElementById("name");
+    const s_marks = document.getElementById("marks");
+    const s_branch = document.getElementById("branch");
+    const addbt = document.getElementById("addbt");
+    const filterbt = document.getElementById("filterbt");
+    const avgbt = document.getElementById("avgbt");
+    const topperbt = document.getElementById("topperbt");
+    const stable = document.getElementById("datatable");
+    const resultDiv = document.getElementById("result");
+
+    let students = [];
+
+    // Add student
+    addbt.addEventListener("click", function () {
+      const name = s_name.value.trim();
+      const marks = parseInt(s_marks.value);
+      const branch = s_branch.value;
+
+      if (name === "" || isNaN(marks) || branch === "select") {
+        alert("⚠️ Please fill all fields.");
+        return;
+      }
+
+      const student = { name, marks, branch };
+      students.push(student);
+
+      renderTable();
+      s_name.value = "";
+      s_marks.value = "";
+      s_branch.value = "select";
+    });
+
+    // Render student table
+    function renderTable() {
+      stable.innerHTML = `
+        <tr>
+          <th>Name</th>
+          <th>Marks</th>
+          <th>Branch</th>
+          <th>Action</th>
+        </tr>`;
+
+      students.forEach((stu, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${stu.name}</td>
+          <td>${stu.marks}</td>
+          <td>${stu.branch}</td>
+          <td><button onclick="deleteStudent(${index})">❌ Delete</button></td>
+        `;
+        stable.appendChild(row);
+      });
+    }
+
+    // Delete student
+    function deleteStudent(index) {
+      students.splice(index, 1);
+      renderTable();
+    }
+
+    // Filter <40 marks
+    filterbt.addEventListener("click", function () {
+      const filtered = students.filter(stu => stu.marks < 40);
+
+      if (filtered.length === 0) {
+        resultDiv.textContent = "🎉 No students found with marks < 40.";
+      } else {
+        let names = filtered.map(stu => stu.name).join(", ");
+        resultDiv.textContent = `⚠️ Students with marks < 40: ${names}`;
+      }
+    });
+
+    // Average
+    avgbt.addEventListener("click", function () {
+      if (students.length === 0) {
+        resultDiv.textContent = "No students to calculate average.";
+        return;
+      }
+      const avg = students.reduce((sum, stu) => sum + stu.marks, 0) / students.length;
+      resultDiv.textContent = `📊 Average Marks: ${avg.toFixed(2)}`;
+    });
+
+    // Top 3 Students
+    topperbt.addEventListener("click", function () {
+      if (students.length === 0) {
+        resultDiv.textContent = "No students available.";
+        return;
+      }
+
+      const sorted = [...students].sort((a, b) => b.marks - a.marks);
+      const top3 = sorted.slice(0, 3);
+
+      let output = "🏆 Top 3 Students:<br>";
+      if (top3[0]) output += `<span class="gold">🥇 ${top3[0].name} (${top3[0].marks})</span><br>`;
+      if (top3[1]) output += `<span class="silver">🥈 ${top3[1].name} (${top3[1].marks})</span><br>`;
+      if (top3[2]) output += `<span class="bronze">🥉 ${top3[2].name} (${top3[2].marks})</span><br>`;
+
+      resultDiv.innerHTML = output;
+    });
+  </script>
+</body>
+</html>
